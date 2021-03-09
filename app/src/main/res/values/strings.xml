@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">TestBlueTooth</string>
+    <string name="BtClient_label">BT客户端</string>
+    <string name="BtServer_label">BT服务端</string>
+
+</resources>
