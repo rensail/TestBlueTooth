@@ -12,6 +12,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 
 import com.example.testbluetooth.bt.BtClientActivity;
 import com.example.testbluetooth.bt.BtServerActivity;
@@ -20,13 +21,17 @@ public class MainActivity extends AppCompatActivity {
 
     private final static int REQUEST_CODE = 0;
     private BluetoothAdapter bluetoothAdapter;
+    private Button bediscovered_button;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //将设备设置成可被搜索到
-       //beDiscovered();
+        bediscovered_button = findViewById(R.id.bediscovered_button);
+
+        if(BluetoothAdapter.getDefaultAdapter().getScanMode()==BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE){
+            bediscovered_button.setClickable(false);
+        }
 
         //动态权限申请
         if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
@@ -89,13 +94,17 @@ public class MainActivity extends AppCompatActivity {
         startActivity(new Intent(MainActivity.this, BtServerActivity.class));
     }
 
-    public void  beDiscovered(){
+    /**
+     * 将设备设置成可被其他设备蓝牙搜索到
+     * @param view
+     */
+    public void  beDiscovered(View view){
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         Intent intent = null;
         if(bluetoothAdapter.getScanMode()!=BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE){
             intent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
             intent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION,300);
+            startActivity(intent);
         }
-        startActivity(intent);
     }
 }

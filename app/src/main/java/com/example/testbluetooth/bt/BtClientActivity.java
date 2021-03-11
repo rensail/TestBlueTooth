@@ -6,6 +6,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -24,6 +27,9 @@ public class BtClientActivity extends Activity implements BtReceiver.Listener,Bt
     private  BtDevicesAdapter btDevicesAdapter = new BtDevicesAdapter(this);
     private  BtReceiver btReceiver;
     private  BtClient btClient;
+    private  final static int CHOOSE_FILE = 0;
+    //文件的路径
+    private  String path;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,10 +42,11 @@ public class BtClientActivity extends Activity implements BtReceiver.Listener,Bt
         devices_recycleview.setLayoutManager(new LinearLayoutManager(this));
         devices_recycleview.setAdapter(btDevicesAdapter);
 
-        connectstate_textview = findViewById(R.id.connectstate2_textview);
-        view_textview = findViewById(R.id.view2_textview);
+        connectstate_textview = findViewById(R.id.connectstate_textview);
+        view_textview = findViewById(R.id.view_textview);
 
-        message_edittext = findViewById(R.id.message2_edittext);
+        message_edittext = findViewById(R.id.message_edittext);
+        file_edittext = findViewById(R.id.file_edittext);
 
         btReceiver = new BtReceiver(this,this);
         btClient = new BtClient(this);
@@ -72,6 +79,10 @@ public class BtClientActivity extends Activity implements BtReceiver.Listener,Bt
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(btReceiver);
+        //释放对BtClient类的监听回调
+        btClient.releaseBtBaseListener();
+        //关闭socket连接
+        btClient.closeScoket();
     }
 
     /**
@@ -114,6 +125,58 @@ public class BtClientActivity extends Activity implements BtReceiver.Listener,Bt
         }
     }
 
+    /**
+     * 从UI获取文件并发送
+     */
+    public void  sendFile(View view){
+        if(btClient.isSocketConnected(null)){
+            String filepath = file_edittext.getText().toString();
+            if(filepath.isEmpty()){
+                APP.toast("发送文件路径不能为空",0);
+            }else{
+                btClient.sendFile(filepath);
+            }
+        }else{
+            APP.toast("没有连接的蓝牙",0);
+        }
+    }
+
+
+    /**
+     * 选择文件
+     */
+    public void chooseFile(View view){
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        //设置文件类型
+        intent.setType("*/*");
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        startActivityForResult(intent,CHOOSE_FILE);
+    }
+
+    /**
+     * Activity返回回来的结果
+     * @param requestCode 请求码
+     * @param resultCode  结果码
+     * @param data 数据
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode == Activity.RESULT_OK){
+            switch (requestCode) {
+                case CHOOSE_FILE:
+                    Uri uri = data.getData();
+                    if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {
+                        path = btClient.getPath(this,uri);
+                        file_edittext.setText(path);
+                    } else {
+                        path = btClient.getRealPathFromUri(this,uri);
+                        file_edittext.setText(path);
+                    }
+                break;
+            }
+        }
+    }
 
     /**
      * BtBase类的监听回调接口重载

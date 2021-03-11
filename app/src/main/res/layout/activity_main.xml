@@ -31,6 +31,12 @@
             />
 
         <Button
+            android:id="@+id/bediscovered_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="可被搜索"
+            android:onClick="beDiscovered"/>
+        <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="BT客户端"

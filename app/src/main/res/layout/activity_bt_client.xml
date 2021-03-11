@@ -28,6 +28,10 @@
                  <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
                 android:orientation="vertical"
                 >
 
@@ -55,13 +59,20 @@
               </LinearLayout>
          </androidx.cardview.widget.CardView>
 
-
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1">
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/devices_recyclerview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"
         />
+        </androidx.cardview.widget.CardView>
 
         </LinearLayout>
     </LinearLayout>
@@ -72,25 +83,7 @@
         android:orientation="vertical"
         android:layout_weight="1">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="连接状态："
-                android:textSize="20dp"
-                android:layout_weight="2"
-                android:gravity="center"/>
-            <TextView
-                android:id="@+id/connectstate2_textview"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textSize="20dp"
-               />
-        </LinearLayout>
+
 
         <include layout="@layout/send_model" />
     </LinearLayout>
