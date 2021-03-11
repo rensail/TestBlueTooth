@@ -48,6 +48,10 @@ public class BtBase {
     //socket连接的UUID
     final static UUID  uuid= UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
+    private final static int TYPE_RECEIVE = 0;
+    private final static int TYPE_SEND = 1;
+    private BtLogAdapter btLogAdapter=new BtLogAdapter();
+
     /**
      * BtBase类的构造函数
      */
@@ -74,7 +78,8 @@ public class BtBase {
                     //读取短消息
                     case FLAG_MSG:
                         String message=dataInputStream.readUTF();
-                        notifyUI(BtBaseListener.MSG,"接收数据: "+message);
+                        Message msg1 = new Message(TYPE_RECEIVE,"接收数据: "+message);
+                        notifyUI(BtBaseListener.MSG,msg1);
                         break;
                     case FLAG_FILE:
                         Util.mkdirs(FILE_PATH);
@@ -87,7 +92,8 @@ public class BtBase {
                         byte[] bytes= new byte[4*1024];
                         long current_len = 0;
                         FileOutputStream fileOutputStream = new FileOutputStream(FILE_PATH+filename);
-                        notifyUI(BtBaseListener.MSG,"正在接收文件("+filename+"),请稍等...");
+                        Message msg2 = new Message(TYPE_RECEIVE,"正在接收文件("+filename+"),请稍等...");
+                        notifyUI(BtBaseListener.MSG,msg2);
                         while ((r=dataInputStream.read(bytes))!=-1){
                             fileOutputStream.write(bytes,0,r);
                             current_len = current_len+r;
@@ -96,7 +102,8 @@ public class BtBase {
                                 break;
                             }
                         }
-                        notifyUI(BtBaseListener.MSG,"接收("+filename+")文件成功！");
+                        Message msg3 = new Message(TYPE_RECEIVE,"接收("+filename+")文件成功！");
+                        notifyUI(BtBaseListener.MSG,msg3);
                         break;
                 }
             }
@@ -117,7 +124,9 @@ public class BtBase {
             dataOutputStream.writeInt(FLAG_MSG);
             dataOutputStream.writeUTF(message);
             dataOutputStream.flush();
-            notifyUI(BtBaseListener.MSG,"发送数据: "+message);
+            Message msg1 = new Message(TYPE_SEND,"发送数据: "+message);
+            notifyUI(BtBaseListener.MSG,msg1);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -151,12 +160,14 @@ public class BtBase {
                    //开始写入文件内容
                    int r;
                    byte[] bytes = new byte[4*1024];
-                   notifyUI(BtBaseListener.MSG,"正在发送文件("+file.getName()+"),请稍等...");
+                   Message msg1= new Message(TYPE_SEND,"正在发送文件("+file.getName()+"),请稍等...");
+                   notifyUI(BtBaseListener.MSG,msg1);
                    while ((r=fileInputStream.read(bytes))!=-1){
                        dataOutputStream.write(bytes);
                    }
                    dataOutputStream.flush();
-                   notifyUI(BtBaseListener.MSG,"发送文件("+file.getName()+")成功！");
+                   Message msg2= new Message(TYPE_SEND,"发送文件("+file.getName()+")成功！");
+                   notifyUI(BtBaseListener.MSG,msg2);
                    fileInputStream.close();
                } catch (Exception e) {
                    e.printStackTrace();

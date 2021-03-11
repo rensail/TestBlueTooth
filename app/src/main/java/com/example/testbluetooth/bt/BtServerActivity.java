@@ -15,20 +15,28 @@ import android.widget.TextView;
 import com.example.testbluetooth.APP;
 import com.example.testbluetooth.R;
 
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 
 public class BtServerActivity extends Activity implements BtBase.BtBaseListener {
     private BtServer btServer;
-    private TextView connectstate_textview, view_textview;
+    private TextView connectstate_textview;
     private EditText message_edittext,file_edittext;
     private  final static int CHOOSE_FILE = 0;
     private  String path;
+    private BtLogAdapter btLogAdapter = new BtLogAdapter();
+    private RecyclerView log_recyclerview;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bt_server);
 
         connectstate_textview = findViewById(R.id.connectstate_textview);
-        view_textview = findViewById(R.id.view_textview);
+
+        log_recyclerview = findViewById(R.id.log_recyclerview);
+        log_recyclerview.setLayoutManager(new LinearLayoutManager(this));
+        log_recyclerview.setAdapter(btLogAdapter);
 
         message_edittext = findViewById(R.id.message_edittext);
         file_edittext = findViewById(R.id.file_edittext);
@@ -47,6 +55,7 @@ public class BtServerActivity extends Activity implements BtBase.BtBaseListener 
                 APP.toast("消息不能为空",0);
             }else{
                 btServer.sendMessage(message);
+                message_edittext.setText("");
             }
         }else{
                APP.toast("没有连接的蓝牙",0);
@@ -64,6 +73,7 @@ public class BtServerActivity extends Activity implements BtBase.BtBaseListener 
                 APP.toast("发送文件路径不能为空",0);
             }else{
                 btServer.sendFile(filepath);
+                file_edittext.setText("");
             }
         }else{
             APP.toast("没有连接的蓝牙",0);
@@ -140,8 +150,11 @@ public class BtServerActivity extends Activity implements BtBase.BtBaseListener 
                 break;
 
             case BtBase.BtBaseListener.MSG:
-                message = String.format("\n%s",object);
-                view_textview.append(message);
+                Message msg = (Message)object;
+                btLogAdapter.addMessage(msg);
+                //自动定位到最新的位置
+                btLogAdapter.notifyItemInserted(btLogAdapter.getItemCount()-1);
+                log_recyclerview.scrollToPosition(btLogAdapter.getItemCount()-1);
                 break;
         }
     }
